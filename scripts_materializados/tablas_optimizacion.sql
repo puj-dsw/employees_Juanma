@@ -8,7 +8,7 @@
  DROP TABLE same_dept;
  DROP TABLE other_salary;
  DROP TABLE current_dept_emp;
-
+-- ....
 -- Materializar vistas con tablas
 -- Crear tabla last_salary
 CREATE TABLE last_salary
