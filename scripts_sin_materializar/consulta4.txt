@@ -1,0 +1,26 @@
+-- 4) Consulta con todas las personas que hoy ganan más salario que una persona específica
+--  p.ej, todas las personas que ganan más que "Elvis Demeyer"
+-- _____________________________________________________________________________________________________________
+CREATE OR REPLACE VIEW  c_salaries_latest_date AS
+    SELECT emp_no, MAX(from_date) AS from_date, MAX(to_date) AS to_date
+    FROM salaries
+    GROUP BY emp_no;
+
+CREATE OR REPLACE VIEW c_current_salaries AS
+    SELECT l.emp_no, salary, l.from_date, l.to_date
+    FROM salaries s
+        INNER JOIN c_salaries_latest_date l
+        ON s.emp_no=l.emp_no AND s.from_date=l.from_date AND l.to_date = s.to_date;
+
+CREATE OR REPLACE VIEW c_current_salaries_elvis AS
+    SELECT s.emp_no, s.salary, s.from_date, s.to_date
+    FROM c_current_salaries s
+        INNER JOIN employees e
+        ON s.emp_no=e.emp_no AND e.first_name = "Elvis" AND e.last_name = "Demeyer";
+
+-- _____________________________________________________________________________________________________________
+SELECT e.first_name, e.last_name, s.salary
+FROM c_current_salaries s
+    INNER JOIN employees e
+    ON s.emp_no=e.emp_no AND s.salary > (SELECT salary FROM c_current_salaries_elvis);
+

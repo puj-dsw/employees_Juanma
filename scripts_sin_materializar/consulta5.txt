@@ -1,0 +1,31 @@
+-- 5) Consulta con el último departamento donde trabaja una persona específica
+--  p.ej. el último departamento donde trabajo "Elvis Demeyer"
+-- _____________________________________________________________________________________________________________
+CREATE OR REPLACE VIEW dept_emp_latest_date AS
+    SELECT emp_no, MAX(from_date) AS from_date, MAX(to_date) AS to_date
+    FROM dept_emp
+    GROUP BY emp_no;
+
+CREATE OR REPLACE VIEW current_dept_emp AS
+    SELECT l.emp_no, dept_no, l.from_date, l.to_date
+    FROM dept_emp d
+        INNER JOIN dept_emp_latest_date l
+        ON d.emp_no=l.emp_no AND d.from_date=l.from_date AND l.to_date = d.to_date;
+
+  -- _____________________________________________________________________________________________________________      
+
+-- crear indices para mejorar la consulta anterior
+
+-- CREATE INDEX e_idx_emp_no ON dept_emp (emp_no);
+-- CREATE INDEX e_idx_dept_no ON dept_emp (dept_no);
+-- CREATE INDEX e_idx_from_date ON dept_emp (from_date);
+-- CREATE INDEX e_idx_to_date ON dept_emp (to_date);
+-- _____________________________________________________________________________________________________________
+
+SELECT e.emp_no, e.first_name, e.last_name, d.dept_name, de.from_date, de.to_date
+FROM employees e
+INNER JOIN current_dept_emp de
+ON e.emp_no = de.emp_no
+INNER JOIN departments d
+ON de.dept_no = d.dept_no
+where first_name = "Elvis" and last_name = "Demeyer";

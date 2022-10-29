@@ -1,0 +1,39 @@
+--7) Consulta con todas las personas que trabajan en el mismo departamento de una persona específica que ganen un salario mayor a esa persona
+--  p.ej. todas las personas que trabajan en el mismo departamento de "Elvis Demeyer" y que ganan más salario que "Elvis Demeyer"
+-- _____________________________________________________________________________________________________________
+
+CREATE OR REPLACE VIEW more_salary AS
+SELECT salary_others.*
+    FROM (
+        SELECT sal.emp_no, sal.first_name, sal.last_name, sal.salary
+            FROM last_salary AS sal 
+		WHERE sal.first_name="Elvis" AND sal.last_name="Demeyer"
+    ) AS salary_elvis,
+    (
+        SELECT sal.emp_no, sal.first_name, sal.last_name, sal.salary
+            FROM last_salary AS sal 
+    ) AS salary_others
+WHERE salary_others.salary > salary_elvis.salary
+;
+
+CREATE OR REPLACE VIEW same_dept AS
+SELECT dept_others.*
+    FROM (
+        SELECT emp.emp_no, emp.first_name, emp.last_name, dept.dept_no
+            FROM current_dept_emp AS dept
+            JOIN employees AS emp
+               ON dept.emp_no = emp.emp_no
+            WHERE emp.first_name="Elvis" AND emp.last_name="Demeyer"
+    ) AS dept_elvis,
+     (
+        SELECT emp.emp_no, emp.first_name, emp.last_name, dept.dept_no
+            FROM current_dept_emp AS dept
+            JOIN employees AS emp
+                ON dept.emp_no = emp.emp_no
+    ) AS dept_others
+WHERE dept_others.dept_no = dept_elvis.dept_no
+;
+-- _____________________________________________________________________________________________________________
+-- Consulta 7
+SELECT sd.emp_no, sd.first_name, sd.last_name, sd.dept_no, ms.salary
+    FROM same_dept_tb AS sd  JOI
